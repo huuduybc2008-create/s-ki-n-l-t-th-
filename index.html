@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <title>Lật thẻ Play Together</title>
+ <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <style>
 body{
   background:#111;
@@ -34,18 +35,17 @@ body{
 .card.hidden{background:#222;}
 .card.removed{visibility:hidden;}
 
-.selector{
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  background:#222;
-  padding:12px;
-  border-radius:10px;
-  display:none;
-  grid-template-columns:repeat(5,50px);
-  gap:8px;
+#selector {
+  position: absolute; /* thay fixed thành absolute */
+  display: none;
+  grid-template-columns: repeat(5, 50px);
+  gap: 8px;
+  background: #222;
+  padding: 10px;
+  border-radius: 10px;
+  z-index: 999;
 }
+
 .icon{
   width:50px;
   height:50px;
@@ -176,8 +176,13 @@ function chooseIcon(src){
 }
 
 function openSelector(card){
-  if(card.classList.contains("removed")) return;
   selectedCard = card;
+  
+  // đặt selector ngay vị trí ô được chọn
+  const rect = card.getBoundingClientRect();
+  selector.style.top = (rect.bottom + window.scrollY + 5) + "px";
+  selector.style.left = (rect.left + window.scrollX) + "px";
+  
   selector.style.display = "grid";
   selector.innerHTML = "";
 

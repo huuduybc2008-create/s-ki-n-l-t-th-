@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Lật thẻ Play Together</title>
+<style>
+body{
+  background:#111;
+  color:white;
+  font-family:Arial;
+  text-align:center;
+}
+.controls{margin:10px;}
+.grid{
+  display:grid;
+  gap:8px;
+  justify-content:center;
+  margin-top:15px;
+}
+.card{
+  width:60px;
+  height:60px;
+  background:#333;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.card img{
+  width:42px;
+  height:42px;
+}
+.card.hidden{background:#222;}
+.card.removed{visibility:hidden;}
+
+.selector{
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#222;
+  padding:12px;
+  border-radius:10px;
+  display:none;
+  grid-template-columns:repeat(5,50px);
+  gap:8px;
+}
+.icon{
+  width:50px;
+  height:50px;
+  background:#444;
+  border-radius:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
+.icon img{
+  width:36px;
+  height:36px;
+}
+.card.completed::after{
+  content:"O";
+  position:absolute;
+  top:2px;
+  right:6px;
+  color:limegreen;
+  font-weight:bold;
+  font-size:18px;
+}
+.card{
+  position:relative;
+}
+
+
+</style>
+</head>
+
+<body>
+
+<h2>Sự kiện Lật Thẻ – Play Together</h2>
+
+<div class="controls">
+  Hàng: <input id="rows" type="number" value="4" style="width:50px">
+  Cột: <input id="cols" type="number" value="5" style="width:50px">
+  <button onclick="createGrid()">Tạo bảng</button>
+</div>
+
+<div id="grid" class="grid"></div>
+<div id="selector" class="selector"></div>
+
+<script>
+const icons = [
+  "1.jpg",
+  "2.jpg",
+  "3.jpg",
+  "4.jpg",
+  "5.jpg",
+  "6.jpg",
+  "7.jpg",
+  "8.jpg",
+  "9.jpg"
+];
+
+let selectedCard = null;
+let first = null;
+
+function createGrid(){
+  const r = rows.value;
+  const c = cols.value;
+  grid.innerHTML="";
+  grid.style.gridTemplateColumns=`repeat(${c},60px)`;
+  for(let i=0;i<r*c;i++){
+    const card=document.createElement("div");
+    card.className="card hidden";
+    card.onclick=()=>openSelector(card);
+    grid.appendChild(card);
+  }
+}
+
+function openSelector(card){
+  if(card.classList.contains("removed")) return;
+  selectedCard = card;
+  selector.style.display = "grid";
+  selector.innerHTML = "";
+
+  // 1️⃣ Nút Skip → khóa ô, vẫn giữ ô
+  const skip = document.createElement("div");
+  skip.className = "icon";
+  skip.textContent = "⏭"; 
+  skip.title = "Bỏ qua ô này";
+  skip.onclick = skipCard;
+  selector.appendChild(skip);
+
+  // 2️⃣ Nút XÓA ô vĩnh viễn → loại bỏ khỏi bảng
+  const deletePermanent = document.createElement("div");
+  deletePermanent.className = "icon";
+  deletePermanent.textContent = "❌"; 
+  deletePermanent.title = "Xóa vĩnh viễn ô này";
+  deletePermanent.onclick = deleteCardPermanently;
+  selector.appendChild(deletePermanent);
+
+  // 3️⃣ Các icon chọn
+  icons.forEach(src=>{
+    const el=document.createElement("div");
+    el.className="icon";
+    const img=document.createElement("img");
+    img.src=src;
+    el.appendChild(img);
+    el.onclick=()=>chooseIcon(src);
+    selector.appendChild(el);
+  });
+}
+
+// Skip → khóa ô, vẫn giữ vị trí
+function skipCard(){
+  selector.style.display = "none";
+  selectedCard.innerHTML = "";         
+  selectedCard.classList.add("hidden"); 
+  selectedCard.classList.add("removed"); 
+  selectedCard.onclick = null;          
+}
+
+// Xóa vĩnh viễn → remove khỏi grid
+function deleteCardPermanently(){
+  selector.style.display = "none";
+  selectedCard.remove();  // xoá hẳn khỏi DOM
+}
+
+// Chọn icon bình thường
+function chooseIcon(src){
+  selector.style.display = "none";
+  selectedCard.innerHTML = `<img src="${src}">`;
+  selectedCard.classList.remove("hidden");
+}
+
+function openSelector(card){
+  if(card.classList.contains("removed")) return;
+  selectedCard = card;
+  selector.style.display = "grid";
+  selector.innerHTML = "";
+
+  // 1️⃣ Nút Skip → khóa ô, vẫn giữ ô
+  const skip = document.createElement("div");
+  skip.className = "icon";
+  skip.textContent = "⏭"; 
+  skip.title = "Bỏ qua ô này";
+  skip.onclick = skipCard;
+  selector.appendChild(skip);
+
+  // 2️⃣ Nút XÓA ô vĩnh viễn → loại bỏ khỏi bảng
+  const deletePermanent = document.createElement("div");
+  deletePermanent.className = "icon";
+  deletePermanent.textContent = "❌"; 
+  deletePermanent.title = "Xóa vĩnh viễn ô này";
+  deletePermanent.onclick = deleteCardPermanently;
+  selector.appendChild(deletePermanent);
+
+  // 3️⃣ Các icon chọn
+  icons.forEach(src=>{
+    const el=document.createElement("div");
+    el.className="icon";
+    const img=document.createElement("img");
+    img.src=src;
+    el.appendChild(img);
+    el.onclick=()=>chooseIcon(src);
+    selector.appendChild(el);
+  });
+}
+
+// Skip → khóa ô, vẫn giữ vị trí
+function skipCard(){
+  selector.style.display = "none";
+  selectedCard.innerHTML = "";         
+  selectedCard.classList.add("hidden"); 
+  selectedCard.classList.add("removed"); 
+  selectedCard.onclick = null;          
+}
+
+// Xóa vĩnh viễn → remove khỏi grid
+function deleteCardPermanently(){
+  selector.style.display = "none";
+  selectedCard.remove();  // xoá hẳn khỏi DOM
+}
+
+// Chọn icon bình thường
+function chooseIcon(src){
+  selector.style.display = "none";
+  selectedCard.innerHTML = `<img src="${src}">`;
+  selectedCard.classList.remove("hidden");
+}
+
+
+
+</script>
+
+</body>
+</html>
